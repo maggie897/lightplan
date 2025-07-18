@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 router.post('/register', async(req,res)=>{
   try{
@@ -44,7 +45,16 @@ router.post('/login', async(req,res)=>{
     if(!isMatch){
       res.status(400).json({message: 'Invalid password'});
     }
-    res.status(200).json({message: 'login successfully', user: {username: user.username, email: user.email}}); 
+
+    const token = jwt.sign(
+      {id: user._id, username: user.username},
+      process.env.JWT_SECRET,
+      {expiresIn:process.env.JWT_EXPIRES_IN}
+    ); 
+
+    res.status(200).json({message: 'login successfully', 
+      token,
+      user: {username: user.username, email: user.email}}); 
   }catch(err){
     console.error(err);
     res.status(500).json({message: 'server error'}); 
