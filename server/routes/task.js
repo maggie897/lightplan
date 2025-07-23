@@ -14,9 +14,12 @@ router.get('/', verifyToken, async(req,res)=>{
 
 router.post('/', verifyToken, async(req,res)=>{
   try{
+    const {title, tag, dueDate} = req.body;
     const newTask = new Task({
       userId: req.user.id,
-      title: req.body.title,
+      title,
+      tag,
+      dueDate
     });
     await newTask.save();
     res.status(201).json(newTask); 
@@ -24,5 +27,28 @@ router.post('/', verifyToken, async(req,res)=>{
     res.status(500).json({message: 'Server Error'}); 
   }
 }); 
+
+router.delete('/:id', verifyToken, async(req,res)=>{
+  try{
+    await Task.deleteOne({_id: req.params.id, userId: req.user.id});
+    res.json({message: 'Task deleted'}); 
+  }catch(err){
+    res.status(500).json({message: 'Server Error'});   
+  }
+})
+
+router.put('/:id', verifyToken, async(req,res) =>{
+  try{
+    const {title, tag, dueDate, completed} = req.body;
+    const updatedTask = await Task.findOneAndUpdate(
+      {_id: req.params.id, userId: req.user.id},
+      {title, tag, dueDate, completed},
+      {new:true}
+    );
+    res.json(updatedTask); 
+  }catch(err){
+    res.status(500).json({message: 'Server Error'})
+  }
+})
 
 module.exports = router; 
