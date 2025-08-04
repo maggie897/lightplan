@@ -13,6 +13,7 @@ mongoose.connect(process.env.MONGO_URI)
 const express = require('express');
 const cors = require('cors');
 const app = express(); 
+const path = require('path'); 
 
 // Listen port will be loaded from .env file, or use 5000
 const port = process.env.PORT || 5000; 
@@ -22,6 +23,8 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes); 
 app.use('/api/task', taskRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
+
 
 //Start server
 app.listen(port,()=>{
