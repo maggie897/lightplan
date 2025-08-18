@@ -10,6 +10,10 @@ function TaskDetails(){
   const [dueDate, setDueDate] = useState(''); 
   const [details, setDetails] = useState(''); 
   const [file, setFile] = useState(null);
+  const [frequency, setFrequency] = useState('None');
+  const [interval, setInterval_] = useState(1); 
+  const [endDate, setEndDate] = useState('');
+  const [reminder, setReminder] = useState(0); 
 
   useEffect(()=>{
       fetchTask();
@@ -23,6 +27,10 @@ function TaskDetails(){
       setTag(res.data.tag); 
       setDueDate(res.data.dueDate?.slice(0,10)); 
       setDetails(res.data.details || ''); 
+      setFrequency(res.data.recurrence.frequency);
+      setInterval_(res.data.recurrence.interval); 
+      setEndDate(res.data.recurrence.endDate);
+      setReminder(res.data.reminder);  
     }catch(err){
       console.error('Failed to fetch task', err);
       alert('Failed to load task');
@@ -69,29 +77,66 @@ function TaskDetails(){
         onChange={e=>setTitle(e.target.value)}
       />
       <br />
-      <label>Tag: </label>
-      <select value={tag} onChange={(e)=>setTag(e.target.value)} >
-        <option value="Routine">Routine</option>
-        <option value="Event">Event</option>
-        <option value="Deadline">Deadline</option>
-        <option value="Other">Other</option>
-      </select>
+      <label>Tag: 
+        <select value={tag} onChange={(e)=>setTag(e.target.value)} >
+          <option value="Routine">Routine</option>
+          <option value="Event">Event</option>
+          <option value="Deadline">Deadline</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
       <br />
-      <label>Due Date: </label>
-      <input 
-        type='date'
-        value={dueDate}
-        onChange={e=>setDueDate(e.target.value)}
-      />
-      {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
+      <label>Due Date: 
+        <input 
+          type='date'
+          value={dueDate}
+          onChange={e=>setDueDate(e.target.value)}
+        />
+        {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
+      </label>
       <br />
-      <label>Details: </label>
-      <input 
-        type='text'
-        value={details}
-        onChange={e=>setDetails(e.target.value)}
-      />
+      <label>Repeat: 
+        <select value={frequency} onChange={(e)=>setFrequency(e.target.value)}>
+          <option>None</option>
+          <option>Daily</option>
+          <option>Weekly</option>
+          <option>Monthly</option>
+        </select>
+      </label>     
+      {frequency !== 'None' && (
+        <>
+          {frequency === 'Weekly' && (
+            <div>
+              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))}>
+                <option value={1}>Every 1 Week</option>
+                <option value={2}>Every 2 Weeks</option>
+              </select>
+            </div>
+          )}
+          <br />
+          <label> End Date(optional)
+            <input type="date" value={endDate || ''} onChange={e => setEndDate(e.target.value)}/>
+          </label>
+        </>
+      )}
       <br />
+      <label>Reminder: 
+          <select value={reminder} onChange={e=>setReminder(e.target.value)}>
+            <option value={0}>No Reminder</option>
+            <option value={60}>60 minutes before</option>
+            <option value={1440}>1 day before</option>
+          </select>
+      </label>
+      <br />
+      <label>Details: 
+        <input 
+          type='text'
+          value={details}
+          onChange={e=>setDetails(e.target.value)}
+        />
+      </label>
+      <br />
+
       <button onClick={handleUpdates}>Save Changes</button>
       <h3>Attachment: </h3>
       {task.imagePath && <img src={`http://localhost:5000/uploads/${task.imagePath}?t=${Date.now()}`} alt="task" style={{width: '300px', marginTop: '10px'}} />}

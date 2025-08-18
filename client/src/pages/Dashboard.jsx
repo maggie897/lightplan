@@ -12,15 +12,51 @@ function Dashboard(){
   const [details, setDetails] = useState(''); 
   const [search, setSearch] = useState('');
   const [file, setFile] = useState(null);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [frequency, setFrequency] = useState('None'); 
+  const [interval, setInterval_] = useState(1);
+  const [endDate, setEndDate] = useState('');
+  const [reminder, setReminder] = useState(0);
+
 
   const fileInputRef = useRef(null);
+
+  const requestReminder = async () => {
+    if(!('Notification' in window)) return;
+    if(Notification.permission === 'default'){
+      await Notification.requestPermission(); 
+    }
+  }; 
+
+  const scheduleReminders = (tasks) => {
+    const now = Date.now();
+    tasks.forEach(t => {
+      if(!t.dueDate || !t.reminder) return;
+      const reminderAt = new Date(t.dueDate).getTime() - t.reminder * 60 * 1000;
+      const delay = reminderAt - now;
+      if(delay>0){
+        setTimeout(()=>{
+          if('Notification' in window && Notification.permission === 'granted'){
+            new Notification('Task Reminder',{
+              body: `${t.title} is due at ${new Date(t.dueDate).toLocaleString()}`
+            })
+          }else{
+            alert(`Reminder: ${t.title} is due at ${new Date(t.dueDate).toLocaleString()}`)
+          }
+        }, delay)
+      }      
+    })
+  }
 
   useEffect(()=>{
     const token = localStorage.getItem('token');
     if(!token){
       navigate('/login');
     }else{
-      fetchTasks();
+      requestReminder();
+      fetchTasks().then(ts => {
+        scheduleReminders(ts); 
+      });
     }
   },[]);
 
@@ -28,8 +64,10 @@ function Dashboard(){
     try{
       const res = await api.get('/task'); 
       setTasks(res.data); 
+      return res.data; 
     }catch(err){
-      console.error(err);     
+      console.error(err);   
+      return [];   
     }
   };
 
@@ -42,6 +80,13 @@ function Dashboard(){
     formData.append('dueDate', dueDate);
     formData.append('details', details);
     formData.append('image',file); 
+    formData.append('isRecurring', isRecurring);
+    formData.append('recurrence', JSON.stringify({
+      frequency,
+      interval: Number(interval) || 1,
+      endDate: endDate || null
+    }));
+    formData.append('reminder', reminder); 
 
     try{
       await api.post('/task',formData, {
@@ -52,6 +97,11 @@ function Dashboard(){
       setTitle('');
       setDueDate(''); 
       setDetails(''); 
+      setIsRecurring(false);
+      setFrequency('None');
+      setReminder(0);
+      setInterval_(1);
+      setEndDate(''); 
       if(fileInputRef.current){
         fileInputRef.current.value =''
       }
@@ -91,6 +141,8 @@ function Dashboard(){
     navigate('/profile');
   };
 
+  
+
   return(
     <div>
       <h1>My LightPlan</h1>
@@ -120,6 +172,40 @@ function Dashboard(){
           value={dueDate}
           onChange={(e)=>setDueDate(e.target.value)}
         />
+        <br />
+        <label>Repeat: 
+          <select value={frequency} onChange={(e)=>setFrequency(e.target.value)}>
+            <option>None</option>
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+          </select>
+        </label>       
+        {frequency !== 'None' && (
+          <>
+          {frequency === 'Weekly' && (
+            <div>
+              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))}>
+                <option value={1}>Every 1 Week</option>
+                <option value={2}>Every 2 Weeks</option>
+              </select>
+            </div>
+          )}
+          <br />
+          <label> End Date(optional)
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}/>
+          </label>
+          </>
+        )}
+        <br />
+        <label>Reminder: 
+          <select value={reminder} onChange={e=>setReminder(e.target.value)}>
+            <option value={0}>No Reminder</option>
+            <option value={60}>60 minutes before</option>
+            <option value={1440}>1 day before</option>
+          </select>
+        </label>
+        <br />
         <input 
           type="text"
           value={details} 
@@ -142,9 +228,12 @@ function Dashboard(){
             style={{backgroundColor: getTagColor(t.tag), cursor: "pointer"}}
             onClick={()=>navigate(`/task/view/${t._id}`)}
           >
-              <h3>{t.title}</h3>
-              <p>Due: {t.dueDate ? new Date(t.dueDate).toLocaleTimeString() : 'N/A'}</p>
+            <h3>{t.title}</h3>
+            <p>Due: {t.dueDate ? new Date(t.dueDate).toLocaleDateString() : 'N/A'}</p>
               {isOverDue(t.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
+              {t.recurrence && t.recurrence.frequency !== 'None' && <span>{t.recurrence.frequency}</span>}
+              <br />
+            
             <button onClick={(e)=> {
               e.stopPropagation();
               deleteTask(t._id)

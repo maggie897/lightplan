@@ -14,6 +14,13 @@ const TaskSchema = new mongoose.Schema({
     default: ''
   },
   dueDate:{type: Date},
+  isRecurring: {type: Boolean, default: false},
+  recurrence: {
+    frequency: {type: String, enum: ['None', 'Daily', 'Weekly', 'Monthly'], default: 'None'},
+    interval: {type: Number, default: 1},
+    endDate: {type: Date}
+  },
+  reminder: {type: Number, default: 0}
 }, {timestamps: true});
 
 module.exports = mongoose.model('Task', TaskSchema); 

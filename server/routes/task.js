@@ -5,6 +5,7 @@ const verifyToken = require('../middleware/authMiddleware');
 const multer = require('multer'); 
 const path = require('path'); 
 const { log, error } = require('console');
+const {getNextDueDate} = require('../utils/recurrence'); 
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb){
@@ -33,7 +34,29 @@ router.post('/upload/:taskId', upload.single('image'), async(req,res)=>{
 router.get('/', verifyToken, async(req,res)=>{
   try{
     const tasks = await Task.find({userId: req.userId});
-    res.json(tasks); 
+    
+    const now = new Date();
+
+    const updatedTasks = await Promise.all(tasks.map(async t=>{
+      if(t.isRecurring && t.dueDate && new Date(t.dueDate) < now){
+        let nextDue = new Date(dueDate);
+
+        while(true){
+          const candidate = getNextDueDate(nextDue, t.recurrence);
+          if(!candidate || candidate> now) break;
+          nextDue = candidate; 
+        }
+
+        if(nextDue > new Date(t.dueDate)){
+          t.dueDate = nextDue;
+          t.completed = false;
+          await Task.updateOne({_id: t._id}, {dueDate: nextDue, completed: false});
+        }
+      }
+      return t; 
+    })); 
+
+    res.json(updatedTasks); 
   }catch(err){
     res.status(500).json({message: 'Server Error'}); 
   }
@@ -51,8 +74,10 @@ router.get('/:id', async(req,res)=>{
 
 router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
   try{
-    const {title, tag, dueDate, details} = req.body;
+    const {title, tag, dueDate, details, isRecurring, recurrence, reminder} = req.body;
     const imagePath = req.file? req.file.filename : null; 
+
+    const rec = recurrence? JSON.parse(recurrence) : undefined; 
 
     const newTask = new Task({
       userId: req.user.id,
@@ -60,7 +85,10 @@ router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
       tag,
       dueDate,
       details,
-      imagePath: imagePath || null
+      imagePath: imagePath || null,
+      isRecurring: isRecurring === 'true' || isRecurring === true,
+      recurrence: rec,
+      reminder: Number(reminder) || 0
     });
     await newTask.save();
     res.status(201).json(newTask); 
@@ -80,10 +108,18 @@ router.delete('/:id', verifyToken, async(req,res)=>{
 
 router.put('/:id', verifyToken, async(req,res) =>{
   try{
-    const {title, tag, dueDate, completed, details, imagePath} = req.body;
+    const payload = {...req.body};
+    if (payload.recurrence && typeof payload.recurrence === 'string'){
+      payload.recurrence = JSON.parse(payload.recurrence);
+    }
+
+    if(payload.recurrence?.frequency === 'Weekly'){
+      payload.recurrence.interval = (payload.recurrence.interval===2)? 2: 1;
+    }
+
     const updatedTask = await Task.findOneAndUpdate(
       {_id: req.params.id, userId: req.user.id},
-      {title, tag, dueDate, completed, details,imagePath},
+      payload,
       {new:true}
     );
     res.json(updatedTask); 
@@ -91,5 +127,7 @@ router.put('/:id', verifyToken, async(req,res) =>{
     res.status(500).json({message: 'Server Error'})
   }
 })
+
+
 
 module.exports = router; 
