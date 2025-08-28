@@ -3,10 +3,9 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import {Routes, Route} from 'react-router-dom'; 
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Profile from './pages/Profile';
 import TaskView from './pages/TaskDetails';
-// import TaskEdit from './pages/TaskEdit'; 
 import TaskDetails from './pages/TaskDetails';
 
 function App() {
