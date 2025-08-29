@@ -74,7 +74,7 @@ router.get('/:id', async(req,res)=>{
 
 router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
   try{
-    const {title, tag, dueDate, details, isRecurring, recurrence, reminder} = req.body;
+    const {title, tag, dueDate, dueTime, details, isRecurring, recurrence, reminder} = req.body;
     const imagePath = req.file? req.file.filename : null; 
 
     const rec = recurrence? JSON.parse(recurrence) : undefined; 
@@ -84,6 +84,7 @@ router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
       title,
       tag,
       dueDate,
+      dueTime,
       details,
       imagePath: imagePath || null,
       isRecurring: isRecurring === 'true' || isRecurring === true,

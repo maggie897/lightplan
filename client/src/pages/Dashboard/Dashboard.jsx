@@ -5,12 +5,12 @@ import AddTaskForm from './AddTaskForm';
 import useTasks from '../../hooks/useTasks';
 import SearchBar from "./SearchBar";
 import TaskGrid from "./TaskGrid";
+import useReminder from "../../hooks/useReminder";
 
 function Dashboard(){
   const navigate = useNavigate();
   const [tasks, fetchTasks, addTask, deleteTask] = useTasks(); 
   const [search, setSearch] = useState('');
-  
 
   useEffect(()=>{
     const token = localStorage.getItem('token');
@@ -20,6 +20,7 @@ function Dashboard(){
       fetchTasks();};
     },[navigate, fetchTasks]);
 
+    useReminder(tasks, true); 
 
   const checkProfile = () => {
     navigate('/profile');

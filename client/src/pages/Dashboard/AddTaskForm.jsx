@@ -4,6 +4,7 @@ export default function addTaskForm({onSubmit}){
   const [title, setTitle] = useState('');
   const [tag, setTag] = useState('Other'); 
   const [dueDate,setDueDate] = useState(''); 
+  const [dueTime, setDueTime] = useState('');
   const [details, setDetails] = useState(''); 
   const [file, setFile] = useState(null);
   const [isRecurring, setIsRecurring] = useState(false);
@@ -15,12 +16,13 @@ export default function addTaskForm({onSubmit}){
   
   const handleSubmit = async(e)=>{
     e.preventDefault();
-    requestReminder(); 
+    await requestReminder(); 
 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('tag', tag);
     formData.append('dueDate', dueDate);
+    formData.append('dueTime', dueTime); 
     formData.append('details', details);
     if(file) formData.append('image',file); 
     formData.append('isRecurring', isRecurring);
@@ -36,6 +38,7 @@ export default function addTaskForm({onSubmit}){
       setTitle('');
       setTag('Other'); 
       setDueDate(''); 
+      setDueTime(''); 
       setDetails(''); 
       setFile(null);
       setIsRecurring(false);
@@ -73,6 +76,10 @@ export default function addTaskForm({onSubmit}){
         <input type="date" 
           value={dueDate}
           onChange={(e)=>setDueDate(e.target.value)}
+        />
+        <input type="time" 
+          value={dueTime}
+          onChange={(e)=>setDueTime(e.target.value)}
         />
         <br />
         <label>Repeat: 

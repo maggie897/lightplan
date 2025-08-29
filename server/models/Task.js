@@ -14,6 +14,7 @@ const TaskSchema = new mongoose.Schema({
     default: ''
   },
   dueDate:{type: Date},
+  dueTime: {type: String},
   isRecurring: {type: Boolean, default: false},
   recurrence: {
     frequency: {type: String, enum: ['None', 'Daily', 'Weekly', 'Monthly'], default: 'None'},

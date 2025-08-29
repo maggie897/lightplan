@@ -8,6 +8,7 @@ function TaskDetails(){
   const [title, setTitle] = useState('');
   const [tag, setTag] = useState(''); 
   const [dueDate, setDueDate] = useState(''); 
+  const [dueTime, setDueTime] = useState(''); 
   const [details, setDetails] = useState(''); 
   const [file, setFile] = useState(null);
   const [frequency, setFrequency] = useState('None');
@@ -26,6 +27,7 @@ function TaskDetails(){
       setTitle(res.data.title);
       setTag(res.data.tag); 
       setDueDate(res.data.dueDate?.slice(0,10)); 
+      setDueTime(res.data.dueTime); 
       setDetails(res.data.details || ''); 
       setFrequency(res.data.recurrence.frequency);
       setInterval_(res.data.recurrence.interval); 
@@ -42,7 +44,8 @@ function TaskDetails(){
     await api.put(`/task/${id}`, {
       title, 
       tag,
-      dueDate, 
+      dueDate,
+      dueTime, 
       details,
       imagePath: task.imagePath
     });
@@ -93,6 +96,12 @@ function TaskDetails(){
           onChange={e=>setDueDate(e.target.value)}
         />
         {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
+      </label>
+      <label>Due Time: 
+        <input type="time" 
+          value={dueTime}
+          onChange={(e)=>setDueTime(e.target.value)}
+        />
       </label>
       <br />
       <label>Repeat: 
