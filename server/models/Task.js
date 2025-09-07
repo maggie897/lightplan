@@ -8,7 +8,8 @@ const TaskSchema = new mongoose.Schema({
     enum:['Routine', 'Event', 'Deadline','Other'],
     default: 'Other',
   },
-  imagePath: {type: String},
+  // imagePath: {type: String},
+  imageKey: {type: String},
   details: {
     type: String,
     default: ''

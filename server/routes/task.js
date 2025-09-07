@@ -6,30 +6,67 @@ const multer = require('multer');
 const path = require('path'); 
 const { log, error } = require('console');
 const {getNextDueDate} = require('../utils/recurrence'); 
+const {s3} = require('../aws/s3'); 
+const {GetObjectCommand, PutObjectCommand} = require('@aws-sdk/client-s3'); 
+const {getSignedUrl} = require('@aws-sdk/s3-request-presigner'); 
+const crypto = require('crypto'); 
 
-const storage = multer.diskStorage({
-  destination: function(req, file, cb){
-    cb(null,'uploads/'); 
-  },
-  filename: function(req, file, cb){
-    const filename = Date.now();
-    cb(null, filename+path.extname(file.originalname));
-  }
-});
-const upload = multer({storage: storage}); 
+// const storage = multer.diskStorage({
+//   destination: function(req, file, cb){
+//     cb(null,'uploads/'); 
+//   },
+//   filename: function(req, file, cb){
+//     const filename = Date.now();
+//     cb(null, filename+path.extname(file.originalname));
+//   }
+// });
 
-router.post('/upload/:taskId', upload.single('image'), async(req,res)=>{
+function makeS3Key(userId, originalname){
+  const extname = path.extname(originalname);
+  const name = crypto.randomBytes(8).toString('hex');
+  return `task/${userId}/${Date.now()}-${name}${extname}`; 
+}
+
+const upload = multer({storage: multer.memoryStorage()}); 
+
+
+// router.post('/upload/:taskId', upload.single('image'), async(req,res)=>{
+//   try{
+//     const task = await Task.findById(req.params.taskId); 
+//     if(!task) return res.status(404).json({message: 'Task not found'}); 
+
+//     task.imagePath = req.file.filename;
+//     await task.save(); 
+//     res.status(200).json({message: 'image updated'}); 
+//   }catch(err){
+//     res.status(500).json({message: 'upload failed', error: err.message}); 
+//   }
+// })
+
+router.post('/:id/image', verifyToken, upload.single('image'), async(req,res)=>{
   try{
-    const task = await Task.findById(req.params.taskId); 
-    if(!task) return res.status(404).json({message: 'Task not found'}); 
+    if(!req.file) return res.status(400).json({message: 'no file'});
 
-    task.imagePath = req.file.filename;
-    await task.save(); 
-    res.status(200).json({message: 'image updated'}); 
+    const Key= makeS3Key(req.user.id, req.file.originalname); 
+    await s3.send(new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    }));
+
+    const updated = await Task.findOneAndUpdate(
+      {_id: req.params.id, userId: req.user.id},
+      {imageKey: Key},
+      {new: true}
+    );
+    res.json(updated); 
   }catch(err){
-    res.status(500).json({message: 'upload failed', error: err.message}); 
+    res.status(500).json({message: 'upload failed', error: err.message})
   }
 })
+
+
 
 router.get('/', verifyToken, async(req,res)=>{
   try{
@@ -72,10 +109,43 @@ router.get('/:id', async(req,res)=>{
   }
 })
 
+router.get('/:id/imageUrl', verifyToken, async(req, res)=>{
+  try{
+    const task = await Task.findById({_id: req.params.id, userId: req.user.id});
+    if(!task) return res.status(404).json({message: 'task not found'});
+    if(!task.imageKey) return res.json({url: null}); 
+
+    const getCommand = new GetObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: task.imageKey,
+    });
+
+    const url = await getSignedUrl(s3,getCommand,{expiresIn: 300});
+    res.json({url}); 
+
+  }catch(err){
+    console.error('Sign failed: ', err);
+    res.status(500).json({message: 'failed to sign url'}); 
+  }
+})
+
 router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
   try{
     const {title, tag, dueDate, dueTime, details, isRecurring, recurrence, reminder} = req.body;
-    const imagePath = req.file? req.file.filename : null; 
+    // const imagePath = req.file? req.file.filename : null; 
+
+    let imageKey;
+
+    if(req.file){
+      const key = makeS3Key(req.user.id, req.file.originalname);
+      await s3.send(new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+      })); 
+      imageKey = key; 
+    }
 
     const rec = recurrence? JSON.parse(recurrence) : undefined; 
 
@@ -86,7 +156,8 @@ router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
       dueDate,
       dueTime,
       details,
-      imagePath: imagePath || null,
+      // imagePath: imagePath || null,
+      imageKey: imageKey || null,
       isRecurring: isRecurring === 'true' || isRecurring === true,
       recurrence: rec,
       reminder: Number(reminder) || 0

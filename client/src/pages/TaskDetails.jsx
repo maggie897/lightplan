@@ -15,10 +15,11 @@ function TaskDetails(){
   const [interval, setInterval_] = useState(1); 
   const [endDate, setEndDate] = useState('');
   const [reminder, setReminder] = useState(0); 
+  const [imageUrl, setImageUrl] = useState(null); 
 
   useEffect(()=>{
       fetchTask();
-    },[id]);
+    },[id]); 
 
   const fetchTask= async()=>{
     try{
@@ -33,11 +34,24 @@ function TaskDetails(){
       setInterval_(res.data.recurrence.interval); 
       setEndDate(res.data.recurrence.endDate);
       setReminder(res.data.reminder);  
+      fetchImageUrl(); 
+
     }catch(err){
       console.error('Failed to fetch task', err);
       alert('Failed to load task');
     }
   }
+
+  const fetchImageUrl = async() =>{
+    try{
+      const res = await api.get(`/task/${id}/imageUrl`);
+      setImageUrl(res.data.url || null); 
+    }catch(err){
+      console.error('failed to get signed url', err);
+      setImageUrl(null); 
+    }
+  }
+
   if(!task) return <p>Loading...</p>
 
   const handleUpdates = async()=>{
@@ -47,22 +61,31 @@ function TaskDetails(){
       dueDate,
       dueTime, 
       details,
-      imagePath: task.imagePath
+      recurrence: JSON.stringify({
+        frequency,
+        interval,
+        endDate: endDate || null
+      }),
+      reminder
     });
     alert('updated');
+    await fetchTask(); 
   }
 
   const handleUpload = async() =>{
+    if(!file) return alert('Please choose an image first.');
     const formData = new FormData();
     formData.append('image', file); 
+
     try{
-      const res = await api.post(`/task/upload/${id}`, formData);
-      alert(res.data.message); 
+      const res = await api.post(`/task/${id}/image`, formData);
+      alert(res.data.message || 'Image Updated'); 
+      setFile(null); 
+      await fetchImageUrl(); 
       await fetchTask(); 
       console.log(res.data)
     }catch(err){
       console.error('upload failed', err);
-      
     }
   }
 
@@ -148,7 +171,7 @@ function TaskDetails(){
 
       <button onClick={handleUpdates}>Save Changes</button>
       <h3>Attachment: </h3>
-      {task.imagePath && <img src={`http://localhost:5000/uploads/${task.imagePath}?t=${Date.now()}`} alt="task" style={{width: '300px', marginTop: '10px'}} />}
+      {imageUrl? (<img src={imageUrl} alt="task" style={{width: '300px', marginTop: '10px'}} />) : (<p>No image</p>)}
       <input type="file" onChange={e=>setFile(e.target.files[0])} />
       <button onClick={handleUpload}>Update Image</button>
       <br />
