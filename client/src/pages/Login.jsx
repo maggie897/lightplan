@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from 'axios'; 
 import { useNavigate } from "react-router-dom";
+import classes from '../style/RegisterLogin.module.css'; 
 
 function Login(){
   const [loginInput, setLoginIput] = useState('');
@@ -34,25 +35,33 @@ function Login(){
   };
 
   return(
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <p>Username/Email: </p>
-        <input type="text"
-          placeholder="Username or Email"
-          required
-          value={loginInput}
-          onChange={(e)=>setLoginIput(e.target.value)}
-        /><br/>
-        <input type="text" 
-          placeholder="password"
-          required
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
-        /><br/>
-        <button type="submit">Login</button>
+    <div className={classes.container}>
+      <h2 className={classes.heading}>Login</h2>
+      <form onSubmit={handleLogin} className={classes.form}>
+        <label className={classes.label}>Username/Email: 
+          <input type="text"
+            required
+            value={loginInput}
+            onChange={(e)=>setLoginIput(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br/>
+        <label className={classes.label}>Password: 
+          <input type="text" 
+            required
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br/>
+        <button type="submit" className={classes.button}>Login</button>
       </form>
-      {error && <p style={{color: 'red'}}>{error}</p>}
+      {error && <p className={classes.error}>{error}</p>}
+      <p>
+        <a href="/forgot-password">Forgot Password?</a>
+      </p>
     </div>
   )
 }

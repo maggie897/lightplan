@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import classes from '../style/RegisterLogin.module.css'; 
 
 function Register(){
   const [username, setUsername] = useState(''); 
@@ -23,7 +24,7 @@ function Register(){
       setEmail('');
       setPassword('');
 
-      navigate('/login');
+      navigate(`/verify?email=${encodeURIComponent(email)}`);
     }catch(err){
       if(err.response && err.response.data.message){
         setError(err.response.data.message)
@@ -34,31 +35,39 @@ function Register(){
   }; 
 
   return(
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <p>Username: </p>
-        <input type="text" 
-          placeholder="Username"
-          required
-          value = {username}
-          onChange={e=>setUsername(e.target.value)}
-          /><br/>
-        <input type="text" 
-          placeholder="Email"
-          required
-          value={email}
-          onChange={e=>setEmail(e.target.value)}
-        /><br/>
-        <input type="text" 
-          placeholder="Password"
-          required
-          value={password}
-          onChange={e=>setPassword(e.target.value)}
-        /><br/>
-        <button type="submit">Submit</button>
+    <div className={classes.container}>
+      <h2 className={classes.heading}>Sign Up</h2>
+      <form onSubmit={handleRegister} className={classes.form}>
+        <label className={classes.label}>Username: 
+          <input type="text" 
+            required  
+            value = {username}
+            onChange={e=>setUsername(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br/>
+        <label className={classes.label}>Email: 
+          <input type="text" 
+            required
+            value={email}
+            onChange={e=>setEmail(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br/>
+        <label className={classes.label}> Password: 
+          <input type="text" 
+            required
+            value={password}
+            onChange={e=>setPassword(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br/>
+        <button type="submit" className={classes.button}>Submit</button>
       </form>
-      {error && <p style={{color:'red'}}>{error}</p> }
+      {error && <p className={classes.error}>{error}</p> }
     </div>
   )
 }

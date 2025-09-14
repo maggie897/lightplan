@@ -1,16 +1,17 @@
 import {Link} from 'react-router-dom';
-import '../Home.css';
+// import '../Home.css';
+import classes from '../style/HomePage.module.css'; 
 
 function Home(){
   return(
-    <div className='home-container'>
-      <h1>Welcome to LightPlan</h1>
+    <div className={classes.container}>
+      <h1 className={classes.heading}>Welcome to LightPlan</h1>
       <div>
         <Link to='/register'>
-          <button>Register</button>
+          <button className={classes.button}>Sign Up</button>
         </Link>
         <Link to='/login'>
-          <button>Login</button>
+          <button className={classes.button}>Login</button>
         </Link>
       </div>
     </div>
