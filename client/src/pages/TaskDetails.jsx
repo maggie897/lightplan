@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from '../api';
+import classes from '../style/TaskDetail.module.css'; 
 
 function TaskDetails(){
   const {id} = useParams();
@@ -95,16 +96,19 @@ function TaskDetails(){
   }
 
   return (
-    <div>
-      <label>Title: </label>
+    <div className={classes.container}>
+      <div className={classes.details}>
+      <h2>Task Details: </h2>
+      <label className={classes.title}>Title: </label>
       <input 
         type={title} 
         value={title}
         onChange={e=>setTitle(e.target.value)}
+        className={classes.input}
       />
       <br />
       <label>Tag: 
-        <select value={tag} onChange={(e)=>setTag(e.target.value)} >
+        <select value={tag} onChange={(e)=>setTag(e.target.value)} className={classes.input}>
           <option value="Routine">Routine</option>
           <option value="Event">Event</option>
           <option value="Deadline">Deadline</option>
@@ -117,18 +121,21 @@ function TaskDetails(){
           type='date'
           value={dueDate}
           onChange={e=>setDueDate(e.target.value)}
+          className={classes.input}
         />
         {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
       </label>
+      <br />
       <label>Due Time: 
         <input type="time" 
           value={dueTime}
           onChange={(e)=>setDueTime(e.target.value)}
+          className={classes.input}
         />
       </label>
       <br />
       <label>Repeat: 
-        <select value={frequency} onChange={(e)=>setFrequency(e.target.value)}>
+        <select value={frequency} onChange={(e)=>setFrequency(e.target.value)} className={classes.input}>
           <option>None</option>
           <option>Daily</option>
           <option>Weekly</option>
@@ -139,7 +146,7 @@ function TaskDetails(){
         <>
           {frequency === 'Weekly' && (
             <div>
-              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))}>
+              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))} className={classes.input}>
                 <option value={1}>Every 1 Week</option>
                 <option value={2}>Every 2 Weeks</option>
               </select>
@@ -147,13 +154,17 @@ function TaskDetails(){
           )}
           <br />
           <label> End Date(optional)
-            <input type="date" value={endDate || ''} onChange={e => setEndDate(e.target.value)}/>
+            <input 
+            type="date" value={endDate || ''} 
+            onChange={e => setEndDate(e.target.value)}
+            className={classes.input}
+            />
           </label>
         </>
       )}
       <br />
       <label>Reminder: 
-          <select value={reminder} onChange={e=>setReminder(e.target.value)}>
+          <select value={reminder} onChange={e=>setReminder(e.target.value)} className={classes.input}>
             <option value={0}>No Reminder</option>
             <option value={60}>60 minutes before</option>
             <option value={1440}>1 day before</option>
@@ -161,20 +172,29 @@ function TaskDetails(){
       </label>
       <br />
       <label>Details: 
+        <br />
         <input 
           type='text'
           value={details}
           onChange={e=>setDetails(e.target.value)}
+          className={classes.detailBox}
         />
       </label>
       <br />
-
-      <button onClick={handleUpdates}>Save Changes</button>
+      <button onClick={handleUpdates} className={classes.button}>Save Changes</button>
+      </div>
+      <div className={classes.attachment}>
       <h3>Attachment: </h3>
-      {imageUrl? (<img src={imageUrl} alt="task" style={{width: '300px', marginTop: '10px'}} />) : (<p>No image</p>)}
-      <input type="file" onChange={e=>setFile(e.target.files[0])} />
-      <button onClick={handleUpload}>Update Image</button>
+      {imageUrl? (<img src={imageUrl} alt="task" style={{width: '300px'}} />) : (<p>No image</p>)}
       <br />
+      <input 
+        type="file" 
+        onChange={e=>setFile(e.target.files[0])} 
+        className={classes.input}
+      />
+      <br />
+      <button onClick={handleUpload} className={classes.button}>Update Image</button>
+      </div>
     </div>
   )
 }

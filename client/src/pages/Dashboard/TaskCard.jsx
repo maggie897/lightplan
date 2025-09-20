@@ -1,14 +1,6 @@
 import { useNavigate } from "react-router-dom";
-
-const getTagColor = (tag) =>{
-  switch(tag){
-    case 'Routine': return 'lightskyblue';
-    case 'Event': return 'orange';
-    case 'Deadline': return 'limegreen';
-    case 'Other': return 'lightgray'; 
-    default: return 'black'; 
-  }
-}; 
+import { getTagColor } from "../../../../server/utils/getTagColor";
+import classes from '../../style/TaskCard.module.css'; 
 
 const isOverDue = (dueDate) =>{
   if(!dueDate) return false;
@@ -19,20 +11,22 @@ export default function TaskCard ({task, onDelete}){
   const navigate = useNavigate();
   return (
     <div 
-    className="task-card"
+    className={classes.taskCard}
     style={{backgroundColor: getTagColor(task.tag), cursor: "pointer"}}
     onClick={()=>navigate(`/task/view/${task._id}`)}
   >
-    <h3>{task.title}</h3>
-    <p>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A'}</p>
+    <h3 className={classes.title}>{task.title}</h3>
+    <div className={classes.tasks}>
+      <span>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A'}</span>
       {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
       {task.recurrence && task.recurrence.frequency !== 'None' && <span>{task.recurrence.frequency}</span>}
-      <br />
-    
-    <button onClick={(e)=> {
-      e.stopPropagation();
-      onDelete(task._id)
-    }}>Delete</button>
+    </div>
+
+    <button 
+      onClick={(e)=> {e.stopPropagation();
+      onDelete(task._id)}}
+      className={classes.button}
+    >X</button>
   </div>
   )
 }

@@ -1,0 +1,30 @@
+.taskCard{
+  position: relative;
+  width: 80%;
+  padding: 10px;
+  border-radius: 8px;
+  color: rgb(249, 248, 246);
+}
+
+.button{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  color: rgb(249, 248, 246);
+  /* font-family: "Comic Sans MS", Courier, monospace; */
+}
+
+.title{
+  margin: 0 0;
+  font-size: 1rem;
+}
+
+.tasks{
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}

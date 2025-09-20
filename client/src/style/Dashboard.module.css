@@ -1,0 +1,83 @@
+.container{
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: rgb(213, 236, 235);
+  color: rgb(59, 55, 55);
+}
+
+.heading{
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.mainContent{
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.leftPanel{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 25%;
+}
+
+.rightPanel{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 70%;
+}
+
+.chart{
+  overflow-x: auto;
+}
+
+.input{
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.legend{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 0.8rem;
+}
+
+.legendItem{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendColor{
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.searchBar{
+  display: inline-flex;
+}
+
+.img{
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+}
+
+.taskGrid{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

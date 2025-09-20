@@ -5,21 +5,12 @@ const verifyToken = require('../middleware/authMiddleware');
 const multer = require('multer'); 
 const path = require('path'); 
 const { log, error } = require('console');
-const {getNextDueDate} = require('../utils/recurrence'); 
+// const {getNextDueDate} = require('../utils/shared/recurrence'); 
 const {s3} = require('../aws/s3'); 
 const {GetObjectCommand, PutObjectCommand} = require('@aws-sdk/client-s3'); 
 const {getSignedUrl} = require('@aws-sdk/s3-request-presigner'); 
 const crypto = require('crypto'); 
-
-// const storage = multer.diskStorage({
-//   destination: function(req, file, cb){
-//     cb(null,'uploads/'); 
-//   },
-//   filename: function(req, file, cb){
-//     const filename = Date.now();
-//     cb(null, filename+path.extname(file.originalname));
-//   }
-// });
+import { getNextDueDate } from '../../shared/recurrence'; 
 
 function makeS3Key(userId, originalname){
   const extname = path.extname(originalname);
@@ -29,19 +20,6 @@ function makeS3Key(userId, originalname){
 
 const upload = multer({storage: multer.memoryStorage()}); 
 
-
-// router.post('/upload/:taskId', upload.single('image'), async(req,res)=>{
-//   try{
-//     const task = await Task.findById(req.params.taskId); 
-//     if(!task) return res.status(404).json({message: 'Task not found'}); 
-
-//     task.imagePath = req.file.filename;
-//     await task.save(); 
-//     res.status(200).json({message: 'image updated'}); 
-//   }catch(err){
-//     res.status(500).json({message: 'upload failed', error: err.message}); 
-//   }
-// })
 
 router.post('/:id/image', verifyToken, upload.single('image'), async(req,res)=>{
   try{
@@ -156,7 +134,6 @@ router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
       dueDate,
       dueTime,
       details,
-      // imagePath: imagePath || null,
       imageKey: imageKey || null,
       isRecurring: isRecurring === 'true' || isRecurring === true,
       recurrence: rec,

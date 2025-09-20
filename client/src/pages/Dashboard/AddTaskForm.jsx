@@ -1,4 +1,5 @@
 import {useRef, useState} from 'react';
+import classes from '../../style/AddTaskForm.module.css'; 
 
 export default function addTaskForm({onSubmit}){
   const [title, setTitle] = useState('');
@@ -60,30 +61,44 @@ export default function addTaskForm({onSubmit}){
 
   return(
     <>
-    <h2>Add Task</h2>
+    <img src="/renwuS.svg" alt="task" className={classes.img}/>
+    <p className={classes.title}>Let's Add Task😊</p>
       <form onSubmit={handleSubmit}>
-        <input type="text" 
-          value={title}
-          onChange={(e)=>setTitle(e.target.value)}
-          placeholder="Task title"
-        />
-        <select value={tag} onChange={(e)=>setTag(e.target.value)}>
-          <option value="Routine">Routine</option>
-          <option value="Event">Event</option>
-          <option value="Deadline">Deadline</option>
-          <option value="Other">Other</option>
-        </select>
-        <input type="date" 
-          value={dueDate}
-          onChange={(e)=>setDueDate(e.target.value)}
-        />
+        <label>Task Title: 
+          <input type="text" 
+            value={title}
+            onChange={(e)=>setTitle(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br />
+        <label>Category: 
+          <select value={tag} onChange={(e)=>setTag(e.target.value)} className={classes.input}>
+            <option value="Routine">Routine</option>
+            <option value="Event">Event</option>
+            <option value="Deadline">Deadline</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <br />
+        <label>Due Date: 
+          <input type="date" 
+            value={dueDate}
+            onChange={(e)=>setDueDate(e.target.value)}
+            className={classes.input}
+          />
+        </label>
+        <br />
+        <label>Due Time: 
         <input type="time" 
           value={dueTime}
           onChange={(e)=>setDueTime(e.target.value)}
+          className={classes.input}
         />
+        </label>
         <br />
         <label>Repeat: 
-          <select value={frequency} onChange={(e)=>setFrequency(e.target.value)}>
+          <select value={frequency} onChange={(e)=>setFrequency(e.target.value)} className={classes.input}>
             <option>None</option>
             <option>Daily</option>
             <option>Weekly</option>
@@ -94,7 +109,7 @@ export default function addTaskForm({onSubmit}){
           <>
           {frequency === 'Weekly' && (
             <div>
-              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))}>
+              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))} className={classes.input}>
                 <option value={1}>Every 1 Week</option>
                 <option value={2}>Every 2 Weeks</option>
               </select>
@@ -102,29 +117,31 @@ export default function addTaskForm({onSubmit}){
           )}
           <br />
           <label> End Date(optional)
-            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}/>
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className={classes.input}/>
           </label>
           </>
         )}
         <br />
         <label>Reminder: 
-          <select value={reminder} onChange={e=>setReminder(e.target.value)}>
+          <select value={reminder} onChange={e=>setReminder(e.target.value)} className={classes.input}>
             <option value={0}>No Reminder</option>
             <option value={60}>60 minutes before</option>
             <option value={1440}>1 day before</option>
           </select>
         </label>
         <br />
-        <input 
-          type="text"
-          value={details} 
-          placeholder="details"
-          onChange={(e)=>setDetails(e.target.value)}
-        />
+        <label>Details: 
+          <input 
+            type="text"
+            value={details} 
+            onChange={(e)=>setDetails(e.target.value)}
+            className={classes.input}
+          />
+        </label>
         <br />  
-        <input type="file" onChange={e=>setFile(e.target.files[0])} ref={fileInputRef} /> 
+        <input type="file" onChange={e=>setFile(e.target.files[0])} ref={fileInputRef} className={classes.input}/> 
         <br />  
-        <button type="submit">Add</button>
+        <button type="submit" className={classes.button}>Add</button>
       </form>
     </>
   )
