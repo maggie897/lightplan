@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { FrappeGantt } from 'frappe-gantt-react';
+import { ViewMode, Gantt } from "gantt-task-react";
+import "gantt-task-react/dist/index.css";
 import {getNextDueDate} from '../../hooks/recurrence'; 
 
 export default function GanttChart({ tasks, onClick }) {
@@ -31,9 +32,9 @@ export default function GanttChart({ tasks, onClick }) {
   return(
     <div>
       <h2>Task Timeline</h2>
-      <FrappeGantt
+      <Gantt
         tasks = {ganttData}
-        viewMode = 'Day'
+        viewMode = {ViewMode.Day}
         onClick = {task => onClick?.(task.id)} />
     </div>
   )
