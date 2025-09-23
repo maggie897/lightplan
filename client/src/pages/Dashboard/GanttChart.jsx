@@ -35,7 +35,9 @@ export default function GanttChart({ tasks, onClick }) {
       <Gantt
         tasks = {ganttData}
         viewMode = {ViewMode.Day}
-        onClick = {task => onClick?.(task.id)} />
+        onClick = {task => onClick?.(task.id)} 
+        listCellWidth="0px"
+      />
     </div>
   )
 
