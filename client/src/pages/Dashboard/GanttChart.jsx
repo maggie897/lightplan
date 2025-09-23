@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { FrappeGantt } from 'frappe-gantt-react';
-import {getNextDueDate} from '../../../../shared/recurrence'; 
+import {getNextDueDate} from '../../hooks/recurrence'; 
 
 export default function GanttChart({ tasks, onClick }) {
   const ganttData = useMemo(() => tasks

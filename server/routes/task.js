@@ -5,12 +5,11 @@ const verifyToken = require('../middleware/authMiddleware');
 const multer = require('multer'); 
 const path = require('path'); 
 const { log, error } = require('console');
-// const {getNextDueDate} = require('../utils/shared/recurrence'); 
+const {getNextDueDate} = require('../utils/recurrence'); 
 const {s3} = require('../aws/s3'); 
 const {GetObjectCommand, PutObjectCommand} = require('@aws-sdk/client-s3'); 
 const {getSignedUrl} = require('@aws-sdk/s3-request-presigner'); 
-const crypto = require('crypto'); 
-import { getNextDueDate } from '../../shared/recurrence'; 
+const crypto = require('crypto');  
 
 function makeS3Key(userId, originalname){
   const extname = path.extname(originalname);
@@ -19,7 +18,6 @@ function makeS3Key(userId, originalname){
 }
 
 const upload = multer({storage: multer.memoryStorage()}); 
-
 
 router.post('/:id/image', verifyToken, upload.single('image'), async(req,res)=>{
   try{
@@ -43,8 +41,6 @@ router.post('/:id/image', verifyToken, upload.single('image'), async(req,res)=>{
     res.status(500).json({message: 'upload failed', error: err.message})
   }
 })
-
-
 
 router.get('/', verifyToken, async(req,res)=>{
   try{
@@ -110,7 +106,6 @@ router.get('/:id/imageUrl', verifyToken, async(req, res)=>{
 router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
   try{
     const {title, tag, dueDate, dueTime, details, isRecurring, recurrence, reminder} = req.body;
-    // const imagePath = req.file? req.file.filename : null; 
 
     let imageKey;
 
@@ -176,7 +171,5 @@ router.put('/:id', verifyToken, async(req,res) =>{
     res.status(500).json({message: 'Server Error'})
   }
 })
-
-
 
 module.exports = router; 

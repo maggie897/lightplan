@@ -21,7 +21,7 @@ function addMonths(date, months){
   return d; 
 }
 
-export function getNextDueDate(dueDate, recurrence){
+function getNextDueDate(dueDate, recurrence){
   const {frequency, interval=1, endDate} = recurrence || {}; 
 
   if(!frequency || frequency==='None') return null; 
@@ -41,6 +41,8 @@ export function getNextDueDate(dueDate, recurrence){
   if(endDate && next && next > new Date(endDate)) return null; 
   return next; 
 }
+
+module.exports = { getNextDueDate };
 
 
 

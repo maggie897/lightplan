@@ -44,6 +44,7 @@ export default function useReminder(tasks, enable = true){
       }
     }
   });
+  
   return()=>{
     timersRef.current.forEach(clearTimeout);
     timersRef.current=[]; 

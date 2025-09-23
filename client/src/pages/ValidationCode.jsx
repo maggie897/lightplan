@@ -61,7 +61,6 @@ function ValidationCode(){
       {success && <p style={{color: 'green'}}>{success}</p>}
     </div>
   )
-
 }
 
 export default ValidationCode; 
