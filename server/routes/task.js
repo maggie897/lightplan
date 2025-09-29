@@ -107,8 +107,14 @@ router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
   try{
     const {title, tag, dueDate, dueTime, details, isRecurring, recurrence, reminder} = req.body;
 
-    let imageKey;
+    if(dueDate && dueTime){
+      const dueDateTime = new Date(`${dueDate}T${dueTime}:00`);
+      if(dueDateTime < new Date()){
+        return res.status(400).json({message: 'Due date/time cannot be in the past'});
+      }
+    }
 
+    let imageKey;
     if(req.file){
       const key = makeS3Key(req.user.id, req.file.originalname);
       await s3.send(new PutObjectCommand({
@@ -121,6 +127,20 @@ router.post('/', verifyToken, upload.single('image'), async(req,res)=>{
     }
 
     const rec = recurrence? JSON.parse(recurrence) : undefined; 
+    if(recurrence?.frequency && !dueDate){
+      return res.status(400).json({ message: 'Repeat frequency requires a due date' });
+    }
+
+    const recentTask = await Task.findOne({
+      userId: req.user.id,
+      title,
+      dueDate,
+      dueTime,
+      createdAt: { $gte: new Date(Date.now() - 5000) } 
+    });    
+    if(recentTask){
+      return res.status(429).json({ message: 'Duplicate task detected' });
+    }
 
     const newTask = new Task({
       userId: req.user.id,

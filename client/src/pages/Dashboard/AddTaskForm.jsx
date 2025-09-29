@@ -14,28 +14,38 @@ export default function addTaskForm({onSubmit}){
   const [endDate, setEndDate] = useState('');
   const [reminder, setReminder] = useState(0);
   const fileInputRef = useRef(null);
+  const [submitting, setSubmitting] = useState(false); 
+
+  const today = new Date().toISOString().split("T")[0];
+  const isToday = dueDate === today;
+  const now = new Date();
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(
+  now.getMinutes()).padStart(2, '0')}`;
   
   const handleSubmit = async(e)=>{
     e.preventDefault();
     await requestReminder(); 
+    if(submitting) return;
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('tag', tag);
-    formData.append('dueDate', dueDate);
-    formData.append('dueTime', dueTime); 
-    formData.append('details', details);
-    if(file) formData.append('image',file); 
-    formData.append('isRecurring', isRecurring);
-    formData.append('recurrence', JSON.stringify({
-      frequency,
-      interval: Number(interval) || 1,
-      endDate: endDate || null
-    }));
-    formData.append('reminder', reminder); 
+    setSubmitting(true);
 
-    await onSubmit(formData);
-
+    try{
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('tag', tag);
+      formData.append('dueDate', dueDate);
+      formData.append('dueTime', dueTime); 
+      formData.append('details', details);
+      if(file) formData.append('image',file); 
+      formData.append('isRecurring', isRecurring);
+      formData.append('recurrence', JSON.stringify({
+        frequency,
+        interval: Number(interval) || 1,
+        endDate: endDate || null
+      }));
+      formData.append('reminder', reminder); 
+  
+      await onSubmit(formData);
       setTitle('');
       setTag('Other'); 
       setDueDate(''); 
@@ -50,6 +60,11 @@ export default function addTaskForm({onSubmit}){
       if(fileInputRef.current){
         fileInputRef.current.value =''
       }
+    }catch(err){
+      console.error(err); 
+    }finally{
+      setSubmitting(false); 
+    }  
   }
   
   const requestReminder = async () => {
@@ -69,6 +84,7 @@ export default function addTaskForm({onSubmit}){
             value={title}
             onChange={(e)=>setTitle(e.target.value)}
             className={classes.input}
+            required
           />
         </label>
         <br />
@@ -85,6 +101,7 @@ export default function addTaskForm({onSubmit}){
           <input type="date" 
             value={dueDate}
             onChange={(e)=>setDueDate(e.target.value)}
+            min={new Date().toISOString().split("T")[0]}
             className={classes.input}
           />
         </label>
@@ -93,12 +110,14 @@ export default function addTaskForm({onSubmit}){
         <input type="time" 
           value={dueTime}
           onChange={(e)=>setDueTime(e.target.value)}
+          min={isToday? currentTime: undefined}
           className={classes.input}
         />
         </label>
         <br />
         <label>Repeat: 
-          <select value={frequency} onChange={(e)=>setFrequency(e.target.value)} className={classes.input}>
+          <select value={frequency} onChange={(e)=>setFrequency(e.target.value)} 
+          disabled={!dueDate} className={classes.input}>
             <option>None</option>
             <option>Daily</option>
             <option>Weekly</option>
@@ -141,7 +160,7 @@ export default function addTaskForm({onSubmit}){
         <br />  
         <input type="file" onChange={e=>setFile(e.target.files[0])} ref={fileInputRef} className={classes.input}/> 
         <br />  
-        <button type="submit" className={classes.button}>Add</button>
+        <button type="submit" className={classes.button} disabled={submitting}>{submitting ? 'Adding...' : 'Add'}</button>
       </form>
     </>
   )
