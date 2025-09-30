@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { getTagColor } from "../../hooks/getTagColor";
 import classes from '../../style/TaskCard.module.css'; 
+import { getNextDueDate } from "../../hooks/recurrence";
 
 const isOverDue = (dueDate) =>{
   if(!dueDate) return false;
@@ -9,16 +10,21 @@ const isOverDue = (dueDate) =>{
 
 export default function TaskCard ({task, onDelete}){
   const navigate = useNavigate();
+
+  const displayDate = task.recurrence?.frequency !== "None"
+    ? getNextDueDate(task.dueDate, task.recurrence) || task.dueDate
+    : task.dueDate; 
+
   return (
     <div 
-    className={classes.taskCard}
-    style={{backgroundColor: getTagColor(task.tag), cursor: "pointer"}}
-    onClick={()=>navigate(`/task/view/${task._id}`)}
-  >
+      className={classes.taskCard}
+      style={{backgroundColor: getTagColor(task.tag), cursor: "pointer"}}
+      onClick={()=>navigate(`/task/view/${task._id}`)}
+    >
     <h3 className={classes.title}>{task.title}</h3>
     <div className={classes.tasks}>
-      <span>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A'}</span>
-      {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
+      <span>Due: {displayDate ? new Date(displayDate).toLocaleDateString() : 'N/A'}</span>
+      {isOverDue(displayDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
       {task.recurrence && task.recurrence.frequency !== 'None' && <span>{task.recurrence.frequency}</span>}
     </div>
 

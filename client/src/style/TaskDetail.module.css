@@ -1,7 +1,25 @@
+.header {
+  display: flex;
+  width: 100%;
+  height: 120px;
+  background-color: rgb(28, 192, 192);
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.headerTitle {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
+  margin-left: 80px;
+}
+
 .container{
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   font-weight: bold;
   font-size: 1.2rem;
   background-color: rgb(213, 236, 235);
@@ -10,13 +28,36 @@
   box-sizing: border-box;
   }
 
-.input{
-  padding: 0.6rem;
-  margin-top: 0.2rem;
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  font-size: 0.8rem;
-}
+  .details{
+    margin-left: 100px;
+  }
+
+  .attachment{
+    margin-right: 150px;
+  }
+
+  .formRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .formRow label {
+    width: 120px;     
+    font-weight: bold;
+  }
+
+  .formRow input,
+  .formRow select,
+  .formRow textarea,
+  .formRow option{
+    flex: 1;
+    padding: 0.6rem;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: Comic Sans MS, Courier, monospace;
+  }
 
 .button{
   width: 120px;
@@ -44,4 +85,36 @@
 .img{
   width: 30px;
   height: 30px;
+}
+
+@media (max-width: 992px) {
+  .container {
+    flex-direction: column;       
+  }
+
+  .details, 
+  .attachment {
+    margin: 0 0 20px 0;           
+    width: 100%;
+  }
+
+  .formRow {
+    flex-direction: column;       
+    align-items: flex-start;
+  }
+
+  .formRow label {
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  .formRow input,
+  .formRow select,
+  .formRow textarea {
+    width: 100%;
+  }
+
+  .headerTitle {
+    font-size: 2rem;             
+  }
 }

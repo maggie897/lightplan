@@ -75,11 +75,12 @@ export default function addTaskForm({onSubmit}){
   }; 
 
   return(
-    <>
-    <img src="/renwuS.svg" alt="task" className={classes.img}/>
+    <div className={classes.container}>
     <p className={classes.title}>Let's Add Task😊</p>
       <form onSubmit={handleSubmit}>
+        <div>
         <label>Task Title: 
+          <br />
           <input type="text" 
             value={title}
             onChange={(e)=>setTitle(e.target.value)}
@@ -87,8 +88,10 @@ export default function addTaskForm({onSubmit}){
             required
           />
         </label>
-        <br />
+        </div>
+        <div>
         <label>Category: 
+          <br />
           <select value={tag} onChange={(e)=>setTag(e.target.value)} className={classes.input}>
             <option value="Routine">Routine</option>
             <option value="Event">Event</option>
@@ -96,8 +99,10 @@ export default function addTaskForm({onSubmit}){
             <option value="Other">Other</option>
           </select>
         </label>
-        <br />
+        </div>
+        <div>
         <label>Due Date: 
+          <br />
           <input type="date" 
             value={dueDate}
             onChange={(e)=>setDueDate(e.target.value)}
@@ -105,8 +110,10 @@ export default function addTaskForm({onSubmit}){
             className={classes.input}
           />
         </label>
-        <br />
+        </div>
+        <div>
         <label>Due Time: 
+          <br />
         <input type="time" 
           value={dueTime}
           onChange={(e)=>setDueTime(e.target.value)}
@@ -114,8 +121,10 @@ export default function addTaskForm({onSubmit}){
           className={classes.input}
         />
         </label>
-        <br />
+        </div>
+        <div>
         <label>Repeat: 
+          <br />
           <select value={frequency} onChange={(e)=>setFrequency(e.target.value)} 
           disabled={!dueDate} className={classes.input}>
             <option>None</option>
@@ -123,7 +132,9 @@ export default function addTaskForm({onSubmit}){
             <option>Weekly</option>
             <option>Monthly</option>
           </select>
-        </label>       
+        </label> 
+        </div>
+        <div>      
         {frequency !== 'None' && (
           <>
           {frequency === 'Weekly' && (
@@ -134,22 +145,32 @@ export default function addTaskForm({onSubmit}){
               </select>
             </div>
           )}
-          <br />
           <label> End Date(optional)
-            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className={classes.input}/>
+            <br />
+            <input 
+              type="date" 
+              value={endDate} 
+              onChange={e => setEndDate(e.target.value)}
+              min={dueDate} 
+              className={classes.input}
+            />
           </label>
           </>
         )}
-        <br />
+        </div>
+        <div>
         <label>Reminder: 
+          <br />
           <select value={reminder} onChange={e=>setReminder(e.target.value)} className={classes.input}>
             <option value={0}>No Reminder</option>
             <option value={60}>60 minutes before</option>
             <option value={1440}>1 day before</option>
           </select>
         </label>
-        <br />
-        <label>Details: 
+        </div>
+        <div>
+        <label>Details:
+          <br /> 
           <input 
             type="text"
             value={details} 
@@ -157,12 +178,12 @@ export default function addTaskForm({onSubmit}){
             className={classes.input}
           />
         </label>
-        <br />  
+        </div>
         <input type="file" onChange={e=>setFile(e.target.files[0])} ref={fileInputRef} className={classes.input}/> 
         <br />  
         <button type="submit" className={classes.button} disabled={submitting}>{submitting ? 'Adding...' : 'Add'}</button>
       </form>
-    </>
+    </div>
   )
 }
 

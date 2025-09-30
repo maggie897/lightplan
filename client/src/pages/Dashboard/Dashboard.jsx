@@ -5,13 +5,14 @@ import useTasks from '../../hooks/useTasks';
 import SearchBar from "./SearchBar";
 import TaskGrid from "./TaskGrid";
 import useReminder from "../../hooks/useReminder";
-import GanttChart from "./GanttChart";
 import classes from '../../style/Dashboard.module.css'; 
+import Calendar from './Calendar'; 
 
 function Dashboard(){
   const navigate = useNavigate();
   const [tasks, fetchTasks, addTask, deleteTask] = useTasks(); 
   const [search, setSearch] = useState('');
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(()=>{
     const token = localStorage.getItem('token');
@@ -33,16 +34,34 @@ function Dashboard(){
   };
 
   return(
+    <>
+     <header className={classes.header}>
+      <h1 className={classes.headerTitle}>My LightPlan</h1>
+      <SearchBar value={search} onChange={setSearch}/>
+    </header>
     <div className={classes.container}>
-      <h1 className={classes.heading}>My LightPlan</h1>
       <div className={classes.mainContent}>
         <div className={classes.leftPanel}>
-          <SearchBar value={search} onChange={setSearch}/>
           <AddTaskForm onSubmit = {addTask}/>
         </div>
         <div className={classes.rightPanel}>
-          <div>
-            <h2>My Tasks</h2>
+          <div className={classes.toggle}>
+              <button
+                className={!showCalendar ? classes.activeTab : ""}
+                onClick={() => setShowCalendar(false)}
+              >
+                My Tasks
+              </button>
+              <button
+                className={showCalendar ? classes.activeTab : ""}
+                onClick={() => setShowCalendar(true)}
+              >
+                My Calendar
+              </button>
+            </div>
+
+            {!showCalendar ? (
+          <>
             <div className={classes.legend}>
               {Object.entries(taskTypeColors).map(([type,color])=>(
                 <div key={type} className={classes.legendItem}>
@@ -53,15 +72,14 @@ function Dashboard(){
               ))}
             </div>
             <TaskGrid tasks= {filtered} onDelete={deleteTask}/>
-          </div>
-            <div className={classes.chart}>
-              <GanttChart
-                tasks={tasks}
-                onClick={(taskId)=>navigate(`/task/view/${taskId}`)} />
+          </>
+        ) : (
+              <Calendar tasks={tasks}/>
+            )}
             </div>
         </div>
       </div>     
-    </div>
+    </>
   )
 }
 

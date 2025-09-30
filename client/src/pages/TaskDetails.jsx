@@ -96,106 +96,127 @@ function TaskDetails(){
   }
 
   return (
-    <div className={classes.container}>
-      <div className={classes.details}>
-      <h2>Task Details: </h2>
-      <label className={classes.title}>Title: </label>
-      <input 
-        type={title} 
-        value={title}
-        onChange={e=>setTitle(e.target.value)}
-        className={classes.input}
-      />
-      <br />
-      <label>Tag: 
-        <select value={tag} onChange={(e)=>setTag(e.target.value)} className={classes.input}>
-          <option value="Routine">Routine</option>
-          <option value="Event">Event</option>
-          <option value="Deadline">Deadline</option>
-          <option value="Other">Other</option>
-        </select>
-      </label>
-      <br />
-      <label>Due Date: 
-        <input 
-          type='date'
-          value={dueDate}
-          onChange={e=>setDueDate(e.target.value)}
-          className={classes.input}
-        />
-        {isOverDue(task.dueDate) && <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>}
-      </label>
-      <br />
-      <label>Due Time: 
-        <input type="time" 
-          value={dueTime}
-          onChange={(e)=>setDueTime(e.target.value)}
-          className={classes.input}
-        />
-      </label>
-      <br />
-      <label>Repeat: 
-        <select value={frequency} onChange={(e)=>setFrequency(e.target.value)} className={classes.input}>
-          <option>None</option>
-          <option>Daily</option>
-          <option>Weekly</option>
-          <option>Monthly</option>
-        </select>
-      </label>     
-      {frequency !== 'None' && (
-        <>
-          {frequency === 'Weekly' && (
-            <div>
-              <select value={interval} onChange={e=>setInterval_(Number(e.target.value))} className={classes.input}>
-                <option value={1}>Every 1 Week</option>
-                <option value={2}>Every 2 Weeks</option>
-              </select>
-            </div>
-          )}
-          <br />
-          <label> End Date(optional)
+    <>
+      <header className={classes.header}>
+        <h1 className={classes.headerTitle}>My LightPlan</h1>
+      </header>
+
+      <div className={classes.container}>
+        <div className={classes.details}>
+          <h2>Task Details: </h2>
+
+          <div className={classes.formRow}>
+            <label>Title:</label>
             <input 
-            type="date" value={endDate || ''} 
-            onChange={e => setEndDate(e.target.value)}
-            className={classes.input}
+              type="text" 
+              value={title}
+              onChange={e => setTitle(e.target.value)}
             />
-          </label>
-        </>
-      )}
-      <br />
-      <label>Reminder: 
-          <select value={reminder} onChange={e=>setReminder(e.target.value)} className={classes.input}>
-            <option value={0}>No Reminder</option>
-            <option value={60}>60 minutes before</option>
-            <option value={1440}>1 day before</option>
-          </select>
-      </label>
-      <br />
-      <label>Details: 
-        <br />
-        <input 
-          type='text'
-          value={details}
-          onChange={e=>setDetails(e.target.value)}
-          className={classes.detailBox}
-        />
-      </label>
-      <br />
-      <button onClick={handleUpdates} className={classes.button}>Save Changes</button>
+          </div>
+
+          <div className={classes.formRow}>
+            <label>Tag:</label>
+            <select value={tag} onChange={e => setTag(e.target.value)}>
+              <option value="Routine">Routine</option>
+              <option value="Event">Event</option>
+              <option value="Deadline">Deadline</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className={classes.formRow}>
+            <label>Due Date:</label>
+            <input 
+              type="date"
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+            />
+            {isOverDue(task.dueDate) && (
+              <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>
+            )}
+          </div>
+
+          <div className={classes.formRow}>
+            <label>Due Time:</label>
+            <input 
+              type="time" 
+              value={dueTime}
+              onChange={e => setDueTime(e.target.value)}
+            />
+          </div>
+
+          <div className={classes.formRow}>
+            <label>Repeat:</label>
+            <select value={frequency} onChange={e => setFrequency(e.target.value)}>
+              <option>None</option>
+              <option>Daily</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+
+          {frequency !== 'None' && (
+            <>
+              {frequency === 'Weekly' && (
+                <div className={classes.formRow}>
+                  <label>Interval:</label>
+                  <select 
+                    value={interval} 
+                    onChange={e => setInterval_(Number(e.target.value))}
+                  >
+                    <option value={1}>Every 1 Week</option>
+                    <option value={2}>Every 2 Weeks</option>
+                  </select>
+                </div>
+              )}
+              <div className={classes.formRow}>
+                <label>End Date (optional):</label>
+                <input 
+                  type="date" 
+                  value={endDate || ''} 
+                  onChange={e => setEndDate(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+
+          <div className={classes.formRow}>
+            <label>Reminder:</label>
+            <select value={reminder} onChange={e => setReminder(e.target.value)}>
+              <option value={0}>No Reminder</option>
+              <option value={60}>60 minutes before</option>
+              <option value={1440}>1 day before</option>
+            </select>
+          </div>
+
+          <div className={classes.formRow}>
+            <label>Details:</label>
+            <textarea
+              value={details}
+              onChange={e => setDetails(e.target.value)}
+              className="detailBox"
+            />
+          </div>
+
+          <button onClick={handleUpdates} className={classes.button}>Save Changes</button>
+        </div>
+
+        <div className={classes.attachment}>
+          <h3>Attachment: </h3>
+          {imageUrl 
+            ? (<img src={imageUrl} alt="task" style={{width: '300px'}} />) 
+            : (<p>No image</p>)
+          }
+          <br />
+          <input 
+            type="file" 
+            onChange={e => setFile(e.target.files[0])} 
+          />
+          <br />
+          <button onClick={handleUpload} className={classes.button}>Update Image</button>
+        </div>
       </div>
-      <div className={classes.attachment}>
-      <h3>Attachment: </h3>
-      {imageUrl? (<img src={imageUrl} alt="task" style={{width: '300px'}} />) : (<p>No image</p>)}
-      <br />
-      <input 
-        type="file" 
-        onChange={e=>setFile(e.target.files[0])} 
-        className={classes.input}
-      />
-      <br />
-      <button onClick={handleUpload} className={classes.button}>Update Image</button>
-      </div>
-    </div>
+    </>
   )
 }
 
