@@ -27,6 +27,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 //Start server
-app.listen(port,()=>{
-  console.log(`server is running on http://localhost:${port}/`)
-})
+if(require.main === module){
+  app.listen(port,()=>{
+    console.log(`server is running on http://localhost:${port}/`)
+  })
+}
+
+module.exports = app; 
