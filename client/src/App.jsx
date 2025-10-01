@@ -22,7 +22,7 @@ function App() {
         <Route path= '/task/view/:id' element={<TaskView />} />
         <Route path='/task/:id' element={<TaskDetails />} />
         <Route path='/verify' element={<ValidationCode/>} />
-        <Route path='/forgot-Password' element={<ForgotPassword/>} />
+        <Route path='/forgot-password' element={<ForgotPassword/>} />
         <Route path='/reset-password' element={<ResetPassword/>} />
       </Routes>
     </>

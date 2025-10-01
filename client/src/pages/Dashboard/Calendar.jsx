@@ -1,12 +1,13 @@
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { enUS } from "date-fns/locale";
-import "../../style/calendar.css";
-import classes from '../../style/Calendar.module.css';
 import { addDays, addWeeks, addMonths } from "date-fns";
+import { enUS } from "date-fns/locale";
 
-const locales = {"en-US": enUS,};
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "../../style/calendar.css";
+import classes from "../../style/Calendar.module.css";
+
+const locales = { "en-US": enUS };
 
 const localizer = dateFnsLocalizer({
   format,
@@ -16,24 +17,27 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const CustomToolbar = ({label, onNavigate}) => (
+// Custom toolbar for calendar navigation
+const CustomToolbar = ({ label, onNavigate }) => (
   <div className={classes.container}>
-  <span className={classes.label}>{label}</span>
-  <div className={classes.button}>
-    <button onClick={() => onNavigate("TODAY")}>Today</button>
-    <button onClick={() => onNavigate("PREV")}>Back</button>
-    <button onClick={() => onNavigate("NEXT")}>Next</button>
+    <span className={classes.label}>{label}</span>
+    <div className={classes.button}>
+      <button onClick={() => onNavigate("TODAY")}>Today</button>
+      <button onClick={() => onNavigate("PREV")}>Back</button>
+      <button onClick={() => onNavigate("NEXT")}>Next</button>
+    </div>
   </div>
-</div>
 );
 
-export default function CalendarView({tasks}) {
+export default function CalendarView({ tasks }) {
   const events = [];
 
-  tasks.forEach(t=>{
-    if(!t.dueDate) return;
+  // Convert tasks into calendar events
+  tasks.forEach((t) => {
+    if (!t.dueDate) return;
     const startDate = new Date(t.dueDate);
 
+    // Non-recurrent tasks
     if (!t.recurrence || t.recurrence.frequency === "None") {
       events.push({
         title: t.title,
@@ -44,10 +48,12 @@ export default function CalendarView({tasks}) {
       return;
     }
 
+    // Recurrent tasks
     const { frequency, interval = 1, endDate } = t.recurrence;
     let current = new Date(startDate);
-    const until = endDate ? new Date(endDate) : addMonths(new Date(), 3); 
-  
+    // Use given endDate, or default to 3 months from now
+    const until = endDate ? new Date(endDate) : addMonths(new Date(), 3);
+
     while (current <= until) {
       events.push({
         title: t.title,
@@ -55,7 +61,7 @@ export default function CalendarView({tasks}) {
         end: new Date(current),
         allDay: true,
       });
-  
+
       if (frequency === "Daily") {
         current = addDays(current, interval);
       } else if (frequency === "Weekly") {
@@ -66,7 +72,7 @@ export default function CalendarView({tasks}) {
         break;
       }
     }
-  })
+  });
 
   return (
     <div style={{ height: "500px", marginTop: "20px" }}>
@@ -76,7 +82,7 @@ export default function CalendarView({tasks}) {
         startAccessor="start"
         endAccessor="end"
         defaultView="month"
-        components={{toolbar: CustomToolbar}}
+        components={{ toolbar: CustomToolbar }}
       />
     </div>
   );

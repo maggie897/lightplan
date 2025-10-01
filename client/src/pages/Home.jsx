@@ -1,20 +1,18 @@
-import {Link} from 'react-router-dom';
-import classes from '../style/HomePage.module.css'; 
+import { Link } from "react-router-dom";
+import classes from "../style/HomePage.module.css";
 
-function Home(){
-  return(
+export default function Home() {
+  return (
     <div className={classes.container}>
       <h1 className={classes.heading}>Welcome to LightPlan</h1>
       <div>
-        <Link to='/register'>
+        <Link to="/register">
           <button className={classes.button}>Sign Up</button>
         </Link>
-        <Link to='/login'>
+        <Link to="/login">
           <button className={classes.button}>Login</button>
         </Link>
       </div>
     </div>
-  )
+  );
 }
-
-export default Home;

@@ -118,7 +118,7 @@ router.post('/login', async(req,res)=>{
       token,
       user: {username: user.username, email: user.email}}); 
   }catch(err){
-    console.error(err);
+    console.error(err.stack);
     res.status(500).json({message: 'server error'}); 
   }
 }); 

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+// Build a full due date and time for a task.
 function buildDueTime(dueDate,dueTime){
   if(!dueDate) return;
   const date = new Date(dueDate).toISOString().slice(0,10);
@@ -17,37 +18,41 @@ function fireReminder(t) {
     }
 }
 
-export default function useReminder(tasks, enable = true){
+export default function useReminder(tasks, enable = true) {
   const timersRef = useRef([]);
-  useEffect(()=>{
-    if(!enable) return;
 
+  useEffect(() => {
+    if (!enable) return;
+
+    // Clear old timers to avoid duplicate reminders
     timersRef.current.forEach(clearTimeout);
-    timersRef.current=[];
+    timersRef.current = [];
 
     const now = Date.now();
-    tasks.forEach(t => {
-    const dueAt = buildDueTime(t.dueDate,t.dueTime);
-    if(!dueAt) return;
-  
-    const reminder = Number(t.reminder ?? 0);
 
-    if(reminder>0){
-      const reminderAt = new Date(dueAt.getTime() - reminder * 60 * 1000);
-      const delay = reminderAt.getTime() - now;
+    tasks.forEach((task) => {
+      const dueAt = buildDueTime(task.dueDate, task.dueTime);
+      if (!dueAt) return;
 
-      if(delay>0){
-        const id = setTimeout(()=>fireReminder(t),delay); 
-        timersRef.current.push(id);
-      }else if (delay <= 0 && delay > -60*1000) {
-        fireReminder(t);
+      const reminder = Number(task.reminder ?? 0);
+
+      if (reminder > 0) {
+        const reminderAt = new Date(dueAt.getTime() - reminder * 60 * 1000);
+        const delay = reminderAt.getTime() - now;
+
+        if (delay > 0) {
+          const id = setTimeout(() => fireReminder(task), delay);
+          timersRef.current.push(id);
+        } else if (delay <= 0 && delay > -60 * 1000) {
+          fireReminder(task);
+        }
       }
-    }
-  });
-  
-  return()=>{
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current=[]; 
-  } 
-  }, [tasks, enable])
+    });
+
+    // Clear timers when component unmounts or task updates
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
+  }, [tasks, enable]);
 }
