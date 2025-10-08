@@ -25,7 +25,7 @@ export default function TaskCard ({task, onDelete}){
         backgroundColor: getTagColor(task.tag),
         cursor: "pointer",
       }}
-      onClick={() => navigate(`/task/view/${task._id}`)}
+      onClick={() => navigate(`/task/${task._id}`)}
     >
       <h3 className={classes.title}>{task.title}</h3>
 

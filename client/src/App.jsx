@@ -18,7 +18,6 @@ function App() {
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
         <Route path='/dashboard' element={<Dashboard />} />
-        <Route path= '/task/view/:id' element={<TaskView />} />
         <Route path='/task/:id' element={<TaskDetails />} />
         <Route path='/verify' element={<ValidationCode />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
