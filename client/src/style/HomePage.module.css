@@ -35,6 +35,7 @@
   transform: scale(0.95);
 }
 
+/* Responsive: Mobile (≤ 600px) */
 @media (max-width: 600px) {
   .heading {
     font-size: 2.2rem; 

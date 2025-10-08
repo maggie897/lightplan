@@ -130,6 +130,8 @@
   font-weight: bold;
 }
 
+/* Responsive: Tablet & below (≤ 992px)
+   Adjust layout from row → column */
 @media (max-width: 992px) {
   .mainContent {
     flex-direction: column;
@@ -151,6 +153,8 @@
   }
 }
 
+/* Responsive: Mobile & below (≤ 600px)
+   Stack header, shrink font, stretch buttons */
 @media (max-width: 600px) {
   .header {
     flex-direction: column;

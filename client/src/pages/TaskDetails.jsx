@@ -1,99 +1,113 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from '../api';
 import classes from '../style/TaskDetail.module.css'; 
 
-function TaskDetails(){
-  const {id} = useParams();
+function TaskDetails() {
+  const { id } = useParams();
+
   const [task, setTask] = useState(null);
   const [title, setTitle] = useState('');
-  const [tag, setTag] = useState(''); 
-  const [dueDate, setDueDate] = useState(''); 
-  const [dueTime, setDueTime] = useState(''); 
-  const [details, setDetails] = useState(''); 
+  const [tag, setTag] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [dueTime, setDueTime] = useState('');
+  const [details, setDetails] = useState('');
   const [file, setFile] = useState(null);
   const [frequency, setFrequency] = useState('None');
-  const [interval, setInterval_] = useState(1); 
+  const [interval, setInterval_] = useState(1);
   const [endDate, setEndDate] = useState('');
-  const [reminder, setReminder] = useState(0); 
-  const [imageUrl, setImageUrl] = useState(null); 
+  const [reminder, setReminder] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(()=>{
       fetchTask();
     },[id]); 
 
-  const fetchTask= async()=>{
-    try{
-      const res= await api.get(`/task/${id}`);
+  // Fetch task details from backend
+  const fetchTask = async () => {
+    try {
+      const res = await api.get(`/task/${id}`);
+
       setTask(res.data);
       setTitle(res.data.title);
-      setTag(res.data.tag); 
-      setDueDate(res.data.dueDate?.slice(0,10)); 
-      setDueTime(res.data.dueTime); 
-      setDetails(res.data.details || ''); 
+      setTag(res.data.tag);
+      setDueDate(res.data.dueDate?.slice(0, 10));
+      setDueTime(res.data.dueTime);
+      setDetails(res.data.details || '');
       setFrequency(res.data.recurrence.frequency);
-      setInterval_(res.data.recurrence.interval); 
+      setInterval_(res.data.recurrence.interval);
       setEndDate(res.data.recurrence.endDate);
-      setReminder(res.data.reminder);  
-      fetchImageUrl(); 
+      setReminder(res.data.reminder);
 
-    }catch(err){
+      fetchImageUrl();
+    } catch (err) {
       console.error('Failed to fetch task', err);
       alert('Failed to load task');
     }
-  }
+  };
 
-  const fetchImageUrl = async() =>{
-    try{
+  // Fetch signed image URL (if exists)
+  const fetchImageUrl = async () => {
+    try {
       const res = await api.get(`/task/${id}/imageUrl`);
-      setImageUrl(res.data.url || null); 
-    }catch(err){
-      console.error('failed to get signed url', err);
-      setImageUrl(null); 
+      setImageUrl(res.data.url || null);
+    } catch (err) {
+      console.error('Failed to get signed url', err);
+      setImageUrl(null);
     }
-  }
+  };
 
-  if(!task) return <p>Loading...</p>
+  // If task is not loaded yet
+  if (!task) return <p>Loading...</p>;
 
-  const handleUpdates = async()=>{
+  const handleUpdates = async () => {
     await api.put(`/task/${id}`, {
-      title, 
+      title,
       tag,
       dueDate,
-      dueTime, 
+      dueTime,
       details,
       recurrence: JSON.stringify({
         frequency,
         interval,
-        endDate: endDate || null
+        endDate: endDate || null,
       }),
-      reminder
+      reminder,
     });
-    alert('updated');
-    await fetchTask(); 
-  }
 
-  const handleUpload = async() =>{
-    if(!file) return alert('Please choose an image first.');
+    alert('Updated');
+    await fetchTask();
+  };
+
+  // Handle image upload
+  const handleUpload = async () => {
+    if (!file) return alert('Please choose an image first.');
+
     const formData = new FormData();
-    formData.append('image', file); 
+    formData.append('image', file);
 
-    try{
+    try {
       const res = await api.post(`/task/${id}/image`, formData);
-      alert(res.data.message || 'Image Updated'); 
-      setFile(null); 
-      await fetchImageUrl(); 
-      await fetchTask(); 
-      console.log(res.data)
-    }catch(err){
-      console.error('upload failed', err);
-    }
-  }
 
-  const isOverDue = (dueDate) =>{
-    if(!dueDate) return false;
-    return new Date(dueDate) < new Date(); 
-  }
+      alert(res.data.message || 'Image Updated');
+      setFile(null);
+
+      await fetchImageUrl();
+      await fetchTask();
+
+      console.log(res.data);
+    } catch (err) {
+      console.error('Upload failed', err);
+    }
+  };
+
+  // Check if the task is overdue
+  const isOverDue = (dueDate) => {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date();
+  };
 
   return (
     <>
@@ -103,20 +117,20 @@ function TaskDetails(){
 
       <div className={classes.container}>
         <div className={classes.details}>
-          <h2>Task Details: </h2>
+          <h2>Task Details:</h2>
 
           <div className={classes.formRow}>
             <label>Title:</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
           <div className={classes.formRow}>
             <label>Tag:</label>
-            <select value={tag} onChange={e => setTag(e.target.value)}>
+            <select value={tag} onChange={(e) => setTag(e.target.value)}>
               <option value="Routine">Routine</option>
               <option value="Event">Event</option>
               <option value="Deadline">Deadline</option>
@@ -126,28 +140,31 @@ function TaskDetails(){
 
           <div className={classes.formRow}>
             <label>Due Date:</label>
-            <input 
+            <input
               type="date"
               value={dueDate}
-              onChange={e => setDueDate(e.target.value)}
+              onChange={(e) => setDueDate(e.target.value)}
+              min={today}
             />
             {isOverDue(task.dueDate) && (
-              <span style={{color: 'red', fontWeight: 'bold'}}>(Overdue)</span>
+              <span style={{ color: 'red', fontWeight: 'bold' }}>
+                (Overdue)
+              </span>
             )}
           </div>
 
           <div className={classes.formRow}>
             <label>Due Time:</label>
-            <input 
-              type="time" 
+            <input
+              type="time"
               value={dueTime}
-              onChange={e => setDueTime(e.target.value)}
+              onChange={(e) => setDueTime(e.target.value)}
             />
           </div>
 
           <div className={classes.formRow}>
             <label>Repeat:</label>
-            <select value={frequency} onChange={e => setFrequency(e.target.value)}>
+            <select value={frequency} onChange={(e) => setFrequency(e.target.value)}>
               <option>None</option>
               <option>Daily</option>
               <option>Weekly</option>
@@ -160,21 +177,22 @@ function TaskDetails(){
               {frequency === 'Weekly' && (
                 <div className={classes.formRow}>
                   <label>Interval:</label>
-                  <select 
-                    value={interval} 
-                    onChange={e => setInterval_(Number(e.target.value))}
+                  <select
+                    value={interval}
+                    onChange={(e) => setInterval_(Number(e.target.value))}
                   >
                     <option value={1}>Every 1 Week</option>
                     <option value={2}>Every 2 Weeks</option>
                   </select>
                 </div>
               )}
+
               <div className={classes.formRow}>
                 <label>End Date (optional):</label>
-                <input 
-                  type="date" 
-                  value={endDate || ''} 
-                  onChange={e => setEndDate(e.target.value)}
+                <input
+                  type="date"
+                  value={endDate || ''}
+                  onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
             </>
@@ -182,7 +200,7 @@ function TaskDetails(){
 
           <div className={classes.formRow}>
             <label>Reminder:</label>
-            <select value={reminder} onChange={e => setReminder(e.target.value)}>
+            <select value={reminder} onChange={(e) => setReminder(e.target.value)}>
               <option value={0}>No Reminder</option>
               <option value={60}>60 minutes before</option>
               <option value={1440}>1 day before</option>
@@ -193,31 +211,41 @@ function TaskDetails(){
             <label>Details:</label>
             <textarea
               value={details}
-              onChange={e => setDetails(e.target.value)}
+              onChange={(e) => setDetails(e.target.value)}
               className="detailBox"
             />
           </div>
 
-          <button onClick={handleUpdates} className={classes.button}>Save Changes</button>
+          <button onClick={handleUpdates} className={classes.button}>
+            Save Changes
+          </button>
         </div>
 
         <div className={classes.attachment}>
-          <h3>Attachment: </h3>
-          {imageUrl 
-            ? (<img src={imageUrl} alt="task" style={{width: '300px'}} />) 
-            : (<p>No image</p>)
-          }
+          <h3>Attachment:</h3>
+
+          {imageUrl ? (
+            <img src={imageUrl} alt="task" style={{ width: '300px' }} />
+          ) : (
+            <p>No image</p>
+          )}
+
           <br />
-          <input 
-            type="file" 
-            onChange={e => setFile(e.target.files[0])} 
+          
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
           />
+
           <br />
-          <button onClick={handleUpload} className={classes.button}>Update Image</button>
+
+          <button onClick={handleUpload} className={classes.button}>
+            Update Image
+          </button>
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default TaskDetails; 
+export default TaskDetails;

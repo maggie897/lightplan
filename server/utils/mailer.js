@@ -19,7 +19,8 @@ async function sendEmail({to, subject, html}) {
       },
     },
   }; 
-  await ses.send(new SendEmailCommand(params));
+  const result = await ses.send(new SendEmailCommand(params));
+  return result;
 }
 
 async function sendVeriEmail(to, code) {
