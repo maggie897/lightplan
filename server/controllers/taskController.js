@@ -46,6 +46,8 @@ exports.getTasks = async (req, res) => {
     const now = new Date();
 
     const updatedTasks = await Promise.all(tasks.map(async t => {
+      let updated = t;
+
       if (t.isRecurring && t.dueDate && new Date(t.dueDate) < now) {
         let nextDue = new Date(t.dueDate);
 
@@ -58,10 +60,14 @@ exports.getTasks = async (req, res) => {
         if (nextDue > new Date(t.dueDate)) {
           t.dueDate = nextDue;
           t.completed = false;
-          await Task.updateOne({ _id: t._id }, { dueDate: nextDue, completed: false });
+          updated = await Task.findByIdAndUpdate(
+            t._id,
+            { dueDate: nextDue, completed: false },
+            { new: true }
+          );
         }
       }
-      return t;
+      return updated;
     }));
 
     res.json(updatedTasks);
